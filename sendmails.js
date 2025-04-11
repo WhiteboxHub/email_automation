@@ -1,3 +1,4 @@
+
 const fs = require('fs');
 const csv = require('csv-parser');
 const { parse, stringify } = require('csv');
@@ -8,14 +9,19 @@ const htmlTemplate = require('./HTMLTemplate');
 // Load user details from JSON file
 const users = JSON.parse(fs.readFileSync('users.json', 'utf8'));
 
+// Daily sending limit
+const DAILY_SENDING_LIMIT = 2; 
+
 // Start the process
 const emails = [];
+let emailsSentToday = 0;
+
 function TimeStamp() {
     const date = new Date();
     const year = date.getFullYear();
-    const month = date.getMonth() + 1; // getMonth() returns month from 0 to 11
+    const month = date.getMonth() + 1; 
     const day = date.getDate();
-    const hour = date.getHours(); // getHours() returns the hour
+    const hour = date.getHours(); 
     const min = date.getMinutes();
     const sec = date.getSeconds();
     return `${day}-${month}-${year} ${hour}:${min}:${sec}`;
@@ -63,9 +69,9 @@ function logToCSV(to, subject) {
 
 // Function to send emails with a delay
 function sendEmails(emails, index) {
-    if (index >= emails.length) {
-        logError('All replies have been sent');
-        console.log('All emails have been sent');
+    if (index >= emails.length || emailsSentToday >= DAILY_SENDING_LIMIT) {
+        logError('All replies for today have been sent');
+        console.log('All emails for today have been sent');
         return;
     }
 
@@ -75,6 +81,10 @@ function sendEmails(emails, index) {
 
     // Iterate over users and send emails
     users.forEach((user) => {
+        if (emailsSentToday >= DAILY_SENDING_LIMIT) {
+            return;
+        }
+
         // Create a transporter for the specific user
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -113,6 +123,8 @@ function sendEmails(emails, index) {
             logToCSV(mailOptions.to, mailOptions.subject);
             console.log(`Email sent from ${user.email} to: ${mailOptions.to}`);
 
+            emailsSentToday++;
+
             // Remove the successfully sent email from the CSV
             removeSentEmail(email.Email);
         });
@@ -123,6 +135,9 @@ function sendEmails(emails, index) {
         sendEmails(emails, index + 1);
     }, 1000); // 1-second delay between emails
 }
+
+
+
 
 // Function to remove sent email from the CSV file
 function removeSentEmail(emailToRemove) {

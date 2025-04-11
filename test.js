@@ -18,7 +18,7 @@ const filteredDomainsAndKeywords = [
   'yahoo.com', 'outlook.com', 'hotmail.com', 'live.com',
   'icloud.com', 'aol.com', 'protonmail.com', 'zoho.com', 'gmx.com',
   'notify', 'no-reply', 'noreply', 'donotreply', 'do-not-reply', 'automail', 'gmail.com', 'mail.com', 'googlemail.com',
-  'jobs-listings@linkedin.com', 'postmaster@logicplanet.com', 'techfetch.com', 'applyonline@dice.com', 'Shiv.prasad@raasinfotek.com'
+  'jobs-listings@linkedin.com', 'postmaster@logicplanet.com', 'techfetch.com', 'applyonline@dice.com', 'Shiv.prasad@raasinfotek.com','e.zoom.us'
 ];
 
 function openInbox(cb) {
@@ -105,32 +105,6 @@ const csvWriter = createCsvWriter({
   append: true
 });
 
-// function writeEmailToCSV(emailRecord) {
-//   const isFileEmpty = !fs.existsSync(path) || fs.statSync(path).size === 0;
-
-//   if (isFileEmpty) {
-//     const headerWriter = createCsvWriter({
-//       path,
-//       header: [
-//         { id: 'email', title: 'Email' },
-//         { id: 'subject', title: 'Subject' },
-//         { id: 'messageid', title: 'MessageID' }
-//       ],
-//       append: false
-//     });
-
-//     headerWriter.writeRecords([])
-//       .then(() => {
-//         console.log('CSV headers written');
-//         appendEmailRecord(emailRecord);
-//       })
-//       .catch(err => {
-//         console.error('Error writing CSV headers:', err);
-//       });
-//   } else {
-//     appendEmailRecord(emailRecord);
-//   }
-// }
 
 
 
@@ -191,6 +165,11 @@ imap.once('error', err => {
   } else {
     console.error('IMAP error:', err);
   }
+});
+
+
+imap.once('end', () => {
+  console.log('Connection to IMAP closed');
 });
 
 imap.connect();
