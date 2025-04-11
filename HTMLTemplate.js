@@ -1,5 +1,6 @@
 
 
+
 const htmlTemplate = (name, experience, skill, location, visa, resumeLink, phone, linkedin, email) => `
 <p>Hello </p>
 <p>I hope this message finds you well</p>
@@ -34,6 +35,7 @@ const htmlTemplate = (name, experience, skill, location, visa, resumeLink, phone
     <table>
         <thead>
             <tr>
+                <th>Name</th>
                 <th>Experience</th>
                 <th>Skill</th>
                 <th>Locations</th>
@@ -43,6 +45,7 @@ const htmlTemplate = (name, experience, skill, location, visa, resumeLink, phone
         </thead>
         <tbody>
             <tr>
+                <td>${name}</td>
                 <td>${experience}</td>
                 <td>${skill}</td>
                 <td>${location}</td>
