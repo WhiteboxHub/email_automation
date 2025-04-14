@@ -35,6 +35,7 @@ const htmlTemplate = (name, experience, skill, location, visa, resumeLink, phone
     <table>
         <thead>
             <tr>
+             
                 <th>Name</th>
                 <th>Experience</th>
                 <th>Skill</th>

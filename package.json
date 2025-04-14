@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "crypto": "^1.0.1",
     "csv": "^6.3.9",
-    "csv-parser": "^3.0.0",
+    "csv-parser": "^3.2.0",
+    "csv-stringify": "^6.5.2",
     "csv-writer": "^1.6.0",
     "dotenv": "^16.4.5",
     "fs": "^0.0.1-security",
@@ -10,7 +12,7 @@
     "lodash": "^4.17.21",
     "mailparser": "^3.7.1",
     "node-imap": "^0.9.6",
-    "nodemailer": "^6.9.14",
+    "nodemailer": "^6.10.0",
     "path": "^0.12.7",
     "xoauth2": "^1.2.0"
   }
