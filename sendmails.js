@@ -8,7 +8,7 @@ require('dotenv').config();
 const htmlTemplate = require('./HTMLTemplate');
 
 // Configuration
-const DAILY_SENDING_LIMIT = 100;
+const DAILY_SENDING_LIMIT = 2;
 const CANDIDATES_DIR = 'candidates';
 const BATCH_FILE = './batch_emails.json';
 const PROGRESS_FILE = './candidate_progress.json';
@@ -70,6 +70,7 @@ async function isEmailAlreadySent(email) {
 }
 
 // Remove email from unseen_emails.csv
+
 function removeSentEmail(emailToRemove) {
   fs.readFile('unseen_emails.csv', 'utf8', (err, data) => {
     if (err) {
@@ -77,13 +78,18 @@ function removeSentEmail(emailToRemove) {
       return;
     }
 
-    parse(data, { columns: true }, (err, records) => {
+    parse(data, { columns: true, skip_empty_lines: true }, (err, records) => {
       if (err) {
         console.error('Error parsing CSV file:', err.message);
         return;
       }
 
-      const updatedRecords = records.filter(record => record.Email !== emailToRemove);
+      // Normalize header check in case Email key has different casing
+      const updatedRecords = records.filter(record => {
+        const keys = Object.keys(record);
+        const emailKey = keys.find(k => k.toLowerCase() === 'email');
+        return record[emailKey] !== emailToRemove;
+      });
 
       stringify(updatedRecords, { header: true }, (err, output) => {
         if (err) {
@@ -102,6 +108,7 @@ function removeSentEmail(emailToRemove) {
     });
   });
 }
+
 
 // Initialize required files and folders
 function initializeFiles() {
@@ -129,12 +136,21 @@ function createEmailBatch() {
   });
 }
 
+// function getBatch() {
 function getBatch() {
   if (fs.existsSync(BATCH_FILE)) {
-    return JSON.parse(fs.readFileSync(BATCH_FILE));
+    try {
+      const content = fs.readFileSync(BATCH_FILE);
+      return JSON.parse(content);
+    } catch (e) {
+      console.error('Error parsing batch file:', e.message);
+      return [];
+    }
   }
   return createEmailBatch();
 }
+
+
 
 function initProgress(candidates) {
   const progress = {};
@@ -222,7 +238,7 @@ async function sendEmailsInSequence(emails, user, candidateId, index) {
   const alreadySent = await isEmailAlreadySent(email.Email);
 
   if (alreadySent) {
-    console.log(`⚠️ Email already sent to ${email.Email} - Skipping...`);
+    //console.log(`⚠️ Email already sent to ${email.Email} - Skipping...`);
     sendEmailsInSequence(emails, user, candidateId, index + 1);
     return;
   }
