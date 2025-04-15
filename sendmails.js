@@ -8,7 +8,7 @@ require('dotenv').config();
 const htmlTemplate = require('./HTMLTemplate');
 
 // Configuration
-const DAILY_SENDING_LIMIT = 2;
+const DAILY_SENDING_LIMIT = 70;
 const CANDIDATES_DIR = 'candidates';
 const BATCH_FILE = './batch_emails.json';
 const PROGRESS_FILE = './candidate_progress.json';
@@ -34,8 +34,8 @@ function logError(message) {
   });
 }
 
-function logToCSV(to, subject) {
-  const csvLine = `${to},${subject},${TimeStamp()}\n`;
+function logToCSV(candidateEmail, to, subject) {
+  const csvLine = `${candidateEmail},${to},${subject},${TimeStamp()}\n`;
   fs.appendFileSync('succes_reply_log.csv', csvLine, (err) => {
     if (err) {
       console.error('Error writing to CSV file:', err.message);
@@ -44,8 +44,7 @@ function logToCSV(to, subject) {
   });
 }
 
-// Check if email was already sent
-async function isEmailAlreadySent(email) {
+async function isEmailAlreadySent(candidateEmail, vendorEmail) {
   return new Promise((resolve) => {
     if (!fs.existsSync('succes_reply_log.csv')) {
       resolve(false);
@@ -55,8 +54,8 @@ async function isEmailAlreadySent(email) {
     const stream = fs.createReadStream('succes_reply_log.csv')
       .pipe(csv())
       .on('data', (row) => {
-        if (row.To === email) {
-          stream.destroy(); // Stop reading if found
+        if (row.Candidate === candidateEmail && row.To === vendorEmail) {
+          stream.destroy();
           resolve(true);
         }
       })
@@ -68,8 +67,6 @@ async function isEmailAlreadySent(email) {
       });
   });
 }
-
-// Remove email from unseen_emails.csv
 
 function removeSentEmail(emailToRemove) {
   fs.readFile('unseen_emails.csv', 'utf8', (err, data) => {
@@ -84,7 +81,6 @@ function removeSentEmail(emailToRemove) {
         return;
       }
 
-      // Normalize header check in case Email key has different casing
       const updatedRecords = records.filter(record => {
         const keys = Object.keys(record);
         const emailKey = keys.find(k => k.toLowerCase() === 'email');
@@ -109,19 +105,16 @@ function removeSentEmail(emailToRemove) {
   });
 }
 
-
-// Initialize required files and folders
 function initializeFiles() {
   if (!fs.existsSync(CANDIDATES_DIR)) {
     fs.mkdirSync(CANDIDATES_DIR);
   }
 
   if (!fs.existsSync('succes_reply_log.csv')) {
-    fs.writeFileSync('succes_reply_log.csv', 'To,Subject,SentAt\n');
+    fs.writeFileSync('succes_reply_log.csv', 'Candidate,To,Subject,SentAt\n');
   }
 }
 
-// Create or read batch
 function createEmailBatch() {
   const emails = [];
   return new Promise((resolve) => {
@@ -136,7 +129,6 @@ function createEmailBatch() {
   });
 }
 
-// function getBatch() {
 function getBatch() {
   if (fs.existsSync(BATCH_FILE)) {
     try {
@@ -149,8 +141,6 @@ function getBatch() {
   }
   return createEmailBatch();
 }
-
-
 
 function initProgress(candidates) {
   const progress = {};
@@ -170,7 +160,6 @@ function markCandidateComplete(candidateId) {
   }
 }
 
-// Final cleanup if needed
 function finalizeBatch() {
   if (!fs.existsSync(BATCH_FILE)) return;
 
@@ -181,7 +170,6 @@ function finalizeBatch() {
   console.log('✅ Batch processed and cleaned up');
 }
 
-// Candidate selection logic
 function getAvailableCandidates() {
   const files = fs.readdirSync(CANDIDATES_DIR);
   return files.filter(file => file.endsWith('.json')).map((file, index) => {
@@ -218,7 +206,6 @@ function selectCandidate(callback) {
   });
 }
 
-// Email sending logic
 async function sendEmailsFromBatch(candidate) {
   const batch = await getBatch();
   const user = JSON.parse(fs.readFileSync(path.join(CANDIDATES_DIR, candidate.filename), 'utf8'));
@@ -235,10 +222,9 @@ async function sendEmailsInSequence(emails, user, candidateId, index) {
   }
 
   const email = emails[index];
-  const alreadySent = await isEmailAlreadySent(email.Email);
+  const alreadySent = await isEmailAlreadySent(user.email, email.Email);
 
   if (alreadySent) {
-    //console.log(`⚠️ Email already sent to ${email.Email} - Skipping...`);
     sendEmailsInSequence(emails, user, candidateId, index + 1);
     return;
   }
@@ -256,7 +242,6 @@ async function sendEmailsInSequence(emails, user, candidateId, index) {
     to: email.Email,
     inReplyTo: email.MessageID,
     references: email.MessageID,
-    // subject: 'Profile of Experienced Professional Available for Opportunities',
     subject: 'Experienced Professional – Resume Attached',
     html: htmlTemplate(
       user.name,
@@ -277,7 +262,7 @@ async function sendEmailsInSequence(emails, user, candidateId, index) {
       console.error(`Error sending to ${mailOptions.to}:`, error.message);
     } else {
       logError(`Reply sent to: ${mailOptions.to}`);
-      logToCSV(mailOptions.to, mailOptions.subject);
+      logToCSV(user.email, mailOptions.to, mailOptions.subject);
       removeSentEmail(mailOptions.to);
       console.log(`✅ Email ${index + 1}/${emails.length} sent to: ${mailOptions.to}`);
       emailsSentToday++;
