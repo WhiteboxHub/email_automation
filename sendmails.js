@@ -8,7 +8,7 @@ require('dotenv').config();
 const htmlTemplate = require('./HTMLTemplate');
 
 // Configuration
-const DAILY_SENDING_LIMIT = 70;
+const DAILY_SENDING_LIMIT = 10;
 const CANDIDATES_DIR = 'candidates';
 const BATCH_FILE = './batch_emails.json';
 const PROGRESS_FILE = './candidate_progress.json';
@@ -242,17 +242,14 @@ async function sendEmailsInSequence(emails, user, candidateId, index) {
     to: email.Email,
     inReplyTo: email.MessageID,
     references: email.MessageID,
-    subject: 'Experienced Professional – Resume Attached',
+    subject: 'ML Engineer | Gen AI Experience | Open to Opportunities',
     html: htmlTemplate(
       user.name,
       user.experience,
-      user.skill,
-      user.location,
-      user.visa,
-      user.resumeLink,
-      user.phone,
+      user.genAI_exp,
+      user.email,
       user.linkedin,
-      user.email
+      user.phone
     )
   };
 
