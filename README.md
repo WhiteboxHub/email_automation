@@ -1,92 +1,127 @@
-# Automated Email Response System
+📧 Automated Email Processing and Reply System
+This project automates two key processes:
 
-This project is designed to automate the extraction of unseen emails from an inbox, filter out non-relevant ones, and send personalized replies using multiple user profiles via Gmail. It also maintains logs for successful and failed email responses.
+Fetching Unseen Emails (excluding common spam and no-reply domains)
 
----
+Automatically Sending Replies to relevant emails using personalized candidate profiles
 
-## ✨ Features
+🔧 Prerequisites
+Node.js installed
 
-- **Fetch unseen emails** using IMAP protocol.
-- **Filter emails** based on domain and keyword to avoid auto-generated messages.
-- **Send customized replies** using an HTML email template.
-- **Log successful replies** into a CSV file.
-- **Log errors and statuses** in a log text file.
-- **Automatically remove** already replied emails from the list.
+Gmail account with App Password enabled
 
----
+.env file with email credentials
 
-## 📁 Project Structure
+users.json containing candidate data (see below)
 
-```bash
+HTML email template (HTMLTemplate.js)
+
+📁 Project Structure
+graphql
+Copy
+Edit
 .
-├── .env                  # Stores sensitive credentials
-├── users.json            # List of user profiles to send emails from
-├── unseen_emails.csv     # Stores fetched unseen emails to respond to
-├── succes_reply_log.csv  # Logs successful email replies
-├── Sending_Reply_log.txt # Logs errors and status messages
-├── HTMLTemplate.js       # Generates HTML email content
-├── sendmails.js          # Reads CSV and sends emails
-├── test.js               # Fetches unseen emails and populates the CSV
-├── package.json          # Node dependencies
-```
-
----
-
-## 🔧 Setup Instructions
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/WhiteboxHub/email_automation.git
-cd email_automation
-```
-
-### 2. Install dependencies
-
-```bash
+├── unseen_emails.csv         # Output CSV from IMAP script
+├── succes_reply_log.csv      # Log of successfully sent replies
+├── Sending_Reply_log.txt     # Log of errors and general activity
+├── batch_emails.json         # Daily batch for email sending
+├── candidate_progress.json   # Tracks batch progress
+├── candidates/               # Individual candidate JSON profiles
+├── users.json                # All candidate profiles
+├── HTMLTemplate.js           # HTML template for email body
+├── imap.js                   # Fetch unseen emails from Gmail
+├── sendemails.js             # Reply to relevant unseen emails
+└── .env                      # Stores Gmail credentials
+📜 .env File
+ini
+Copy
+Edit
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-app-password
+✅ Setup Instructions
+1. Install Dependencies
+bash
+Copy
+Edit
 npm install
-```
+2. Prepare .env
+Add your Gmail credentials using App Passwords for security.
 
-### 3. Create `.env` file
+📥 1. Fetching Unseen Emails
+Script: imap.js
+This script:
 
-```env
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
-```
+Connects to Gmail using IMAP
 
-### 4. Create `users.json`
+Filters unseen emails from unwanted domains or keywords
 
-```json
+Extracts sender email, subject, and message ID
+
+Writes valid results to unseen_emails.csv
+
+Run:
+bash
+Copy
+Edit
+node imap.js
+📤 2. Sending Automated Replies
+Script: sendemails.js
+This script:
+
+Prompts you to choose a candidate profile
+
+Picks up to 3 unseen emails for the day
+
+Sends personalized replies using the candidate's info and the HTMLTemplate
+
+Logs successful replies and removes processed emails from unseen_emails.csv
+
+Run:
+bash
+Copy
+Edit
+node sendemails.js
+Email Sending Limits:
+3 emails/day per run (can be changed in code via DAILY_SENDING_LIMIT)
+
+🧑‍💼 users.json Format
+json
+Copy
+Edit
 [
   {
     "name": "John Doe",
-    "email": "john@example.com",
-    "appPassword": "your_app_password",
-    "experience": "5+ years",
-    "skill": "Full Stack Development",
-    "location": "San Francisco, CA",
-    "visa": "H1B",
-    "resumeLink": "https://link-to-resume.com",
-    "phone": "123-456-7890",
-    "linkedin": "https://linkedin.com/in/yourprofile"
+    "email": "johndoe@gmail.com",
+    "appPassword": "your-app-password",
+    "experience": "5 years in ML",
+    "genAI_exp": "2 years with GenAI",
+    "linkedin": "https://linkedin.com/in/johndoe",
+    "phone": "+1234567890"
   }
 ]
-```
+On first run, this will be split into individual JSON files under candidates/.
 
----
+HTMLTemplate.js Format
+Should export a function that returns HTML content:
 
-## ✅ Usage
+js
+Copy
+Edit
+module.exports = function(name, experience, genAI_exp, email, linkedin, phone) {
+  return `
+    <p>Hi,</p>
+    <p>This is ${name}, with ${experience} of experience and hands-on work in GenAI (${genAI_exp}).</p>
+    <p>Reach me at ${email}, or connect via <a href="${linkedin}">LinkedIn</a>.</p>
+    <p>Phone: ${phone}</p>
+  `;
+};
+Logs and Tracking
 
-### Fetch unseen emails
+Sending_Reply_log.txt: All actions and errors
 
-```bash
-node test.js
-```
+succes_reply_log.csv: Sent email logs
 
-### Send replies to extracted emails
+unseen_emails.csv: New unseen emails
 
-```bash
-node sendmails.js
-```
+batch_emails.json & candidate_progress.json: Batch management
 
----

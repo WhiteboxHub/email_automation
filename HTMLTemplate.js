@@ -1,32 +1,34 @@
-const htmlTemplate = (name, experience, genAI_exp, email, linkedin, phone) => `
+const htmlTemplate = (name, experience, genAI_exp, software_exp, email, linkedin, phone) => `
+
 <p>Hello,</p>
 <p>Good morning! I hope you are doing well.</p>
-<p>My name is ${name}, and I am an ML Engineer with ${experience} and ${genAI_exp} hands-on experience in Generative AI. I am currently exploring new opportunities and would love to connect if there's a role that aligns with my background.</p>
+<p>My name is ${name}, and I am an ML Engineer with ${experience}, including ${genAI_exp} of hands-on experience in Generative AI. ${software_exp} I am currently exploring new opportunities and would love to connect if there's a role that aligns with my background.</p>
 
 <h3>In Generative AI, I've recently worked on:</h3>
 <ul>
-    <li>RAG (Retrieval Augmented Generation)</li>
+    <li>RAG (Retrieval Augmented Generation) and Agentic AI systems</li>
     <li>LLMs (Large Language Models)</li>
-    <li>Agentic AI systems</li>
     <li>Fine-tuning</li>
+    <li>Classification and Summarization</li>
 </ul>
 
 <h3>In traditional ML, I've worked extensively with:</h3>
 <ul>
-    <li>ML Ops pipelines</li>
+    <li>MLOps</li>
     <li>MLflow</li>
     <li>Databricks</li>
+    <li>AWS</li>
 </ul>
 
 <p>You can view my LinkedIn profile here: <a href="${linkedin}" target="_blank">${linkedin}</a></p>
 
-<p>If you need my resume or any other details, please feel free to contact me at <strong style="color:darkblue"><a href="mailto:${email}">${email}</a></strong> or call me to this <strong style="color:darkblue">${phone}</strong>.</p>
+<p>If you’d like a copy of my resume or any additional details, feel free to reach out at <strong style="color:darkblue"><a href="mailto:${email}">${email}</a></strong></p>
 
 <p>Looking forward to hearing from you!</p>
 
 <p>Best regards,</p>
 <p><strong>${name}</strong></p>
-
+<p style="margin-top: -10px; font-size: 15px;"><strong><a href="tel:${phone}">${phone}</a></strong></p>
 <html lang="en">
 <head>
     <title>${name} - ML Engineer Profile</title>
