@@ -2,7 +2,7 @@ const htmlTemplate = (name, experience, genAI_exp, software_exp, email, linkedin
 
 <p>Hello,</p>
 <p>Good morning! I hope you are doing well.</p>
-<p>My name is ${name}, and I am an ML Engineer with ${experience}, including ${genAI_exp} of hands-on experience in Generative AI. ${software_exp} I am currently exploring new opportunities and would love to connect if there's a role that aligns with my background.</p>
+<p>My name is ${name}, and I am an ML Engineer with ${experience}, including ${genAI_exp} of hands-on experience in Generative AI.<br/>I am currently exploring new opportunities and would love to connect if there's a role that aligns with my background.</p>
 
 <h3>In Generative AI, I've recently worked on:</h3>
 <ul>

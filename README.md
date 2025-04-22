@@ -10,9 +10,9 @@ Node.js installed
 
 Gmail account with App Password enabled
 
-.env file with email credentials
+.env file with email credentials of Marketing Manager 
 
-users.json containing candidate data (see below)
+users.json containing candidate data
 
 HTML email template (HTMLTemplate.js)
 
@@ -70,7 +70,7 @@ This script:
 
 Prompts you to choose a candidate profile
 
-Picks up to 3 unseen emails for the day
+Picks up to 100 unseen emails for the day
 
 Sends personalized replies using the candidate's info and the HTMLTemplate
 
@@ -82,7 +82,7 @@ Copy
 Edit
 node sendemails.js
 Email Sending Limits:
-3 emails/day per run (can be changed in code via DAILY_SENDING_LIMIT)
+100 emails/day per run (can be changed in code via DAILY_SENDING_LIMIT)
 
 🧑‍💼 users.json Format
 json

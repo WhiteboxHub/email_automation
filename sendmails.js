@@ -8,7 +8,7 @@ require('dotenv').config();
 const htmlTemplate = require('./HTMLTemplate');
 
 // Configuration
-const DAILY_SENDING_LIMIT = 3;
+const DAILY_SENDING_LIMIT = 100;
 const CANDIDATES_DIR = 'candidates';
 const BATCH_FILE = './batch_emails.json';
 const PROGRESS_FILE = './candidate_progress.json';
@@ -97,7 +97,7 @@ function removeSentEmail(emailToRemove) {
           if (err) {
             console.error('Error writing updated CSV file:', err.message);
           } else {
-            console.log(`✅ Email ${emailToRemove} removed from unseen_emails.csv`);
+            console.log(`Email ${emailToRemove} removed from unseen_emails.csv`);
           }
         });
       });
